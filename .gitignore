@@ -1,0 +1,13 @@
+# Ignorar archivos de proyecto temporales de Code::Blocks
+*.layout
+*.depend
+*.layout.save
+
+# Ignorar ejecutables y objetos compilados
+*.exe
+*.o
+*.obj
+
+# Ignorar carpetas de compilación
+bin/
+obj/
