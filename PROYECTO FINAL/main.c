@@ -51,58 +51,52 @@ void mostrarDatosGenerales(struct Vehicle v) {
     printf("Marca: %s\n", v.marca);
     printf("Modelo: %s\n", v.modelo);
     printf("Tipo Combustible: %s\n", v.tipoCombustible);
-    printf("Costo Combustible Gasolina: %.2f\n", v.kmGalCarretera);
-    printf("Costo Combustible Gasoil: %.2f\n", v.kmGalCiudad);
+    printf("Km/Gal Carretera: %.2f\n", v.kmGalCarretera);
+    printf("Km/Gal Ciudad: %.2f\n", v.kmGalCiudad);
     printf("Costo Gomas: %.2f\n", v.costoGomasKm);
     printf("Costo Seguro: %.2f\n", v.costoSeguro12Meses);
     printf("Costo Mantenimiento: %.2f\n", v.costoMantenimientoKm);
     printf("Costo Vehiculo: %.2f\n", v.costoVehiculo);
+    printf("Vida Util: %d\n", v.vidaUtil);
+    printf("Depreciacion: %.2f\n", v.depreciacion);
+    printf("Km promedio/año: %.2f\n", v.kmAnioPromedio);
 }
 
-void modificarVehiculo(struct Vehicle *v) {
-    printf("Modificar placa (%s): ", v->placa);
-    scanf("%s", v->placa);
-    printf("Modificar marca (%s): ", v->marca);
-    scanf("%s", v->marca);
-    printf("Modificar modelo (%s): ", v->modelo);
-    scanf("%s", v->modelo);
-    printf("Modificar tipo de combustible (%s): ", v->tipoCombustible);
-    scanf("%s", v->tipoCombustible);
-    printf("Modificar Km x Galon Carretera (%.2f): ", v->kmGalCarretera);
-    scanf("%f", &v->kmGalCarretera);
-    printf("Modificar Km x Galon Ciudad (%.2f): ", v->kmGalCiudad);
-    scanf("%f", &v->kmGalCiudad);
-    printf("Modificar Costo Gomas y Km de gomas (%.2f): ", v->costoGomasKm);
-    scanf("%f", &v->costoGomasKm);
-    printf("Modificar Costo Seguro por 12 meses (%.2f): ", v->costoSeguro12Meses);
-    scanf("%f", &v->costoSeguro12Meses);
-    printf("Modificar Costo Mantenimiento y cantidad kilometros (%.2f): ", v->costoMantenimientoKm);
-    scanf("%f", &v->costoMantenimientoKm);
-    printf("Modificar Costo Vehiculo (%.2f): ", v->costoVehiculo);
-    scanf("%f", &v->costoVehiculo);
-    printf("Modificar Vida Util (year) (%d): ", v->vidaUtil);
-    scanf("%d", &v->vidaUtil);
-    printf("Modificar Depreciacion (%.2f): ", v->depreciacion);
-    scanf("%f", &v->depreciacion);
-    printf("Modificar Km por year promedio (%.2f): ", v->kmAnioPromedio);
-    scanf("%f", &v->kmAnioPromedio);
+void guardarVehiculo(struct Vehicle v) {
+    FILE *f = fopen("vehiculos.txt", "a"); // "a" = append, agrega al final
+    if (f == NULL) {
+        printf("Error al abrir el archivo.\n");
+        return;
+    }
+    fprintf(f, "%s %s %s %s %.2f %.2f %.2f %.2f %.2f %.2f %d %.2f %.2f\n",
+            v.placa, v.marca, v.modelo, v.tipoCombustible,
+            v.kmGalCarretera, v.kmGalCiudad, v.costoGomasKm,
+            v.costoSeguro12Meses, v.costoMantenimientoKm,
+            v.costoVehiculo, v.vidaUtil, v.depreciacion,
+            v.kmAnioPromedio);
+    fclose(f);
+    printf("Vehiculo guardado en archivo.\n");
 }
 
-void borrarVehiculo(struct Vehicle *v) {
-    strcpy(v->placa, "");
-    strcpy(v->marca, "");
-    strcpy(v->modelo, "");
-    strcpy(v->tipoCombustible, "");
-    v->kmGalCarretera = 0;
-    v->kmGalCiudad = 0;
-    v->costoGomasKm = 0;
-    v->costoSeguro12Meses = 0;
-    v->costoMantenimientoKm = 0;
-    v->costoVehiculo = 0;
-    v->vidaUtil = 0;
-    v->depreciacion = 0;
-    v->kmAnioPromedio = 0;
-    printf("Vehiculo borrado.\n");
+void mostrarVehiculosGuardados() {
+    FILE *f = fopen("vehiculos.txt", "r");
+    if (f == NULL) {
+        printf("No hay vehiculos guardados.\n");
+        return;
+    }
+
+    struct Vehicle v;
+    while (fscanf(f, "%s %s %s %s %f %f %f %f %f %f %d %f %f",
+                  v.placa, v.marca, v.modelo, v.tipoCombustible,
+                  &v.kmGalCarretera, &v.kmGalCiudad, &v.costoGomasKm,
+                  &v.costoSeguro12Meses, &v.costoMantenimientoKm,
+                  &v.costoVehiculo, &v.vidaUtil, &v.depreciacion,
+                  &v.kmAnioPromedio) == 13) {
+        mostrarDatosGenerales(v);
+        printf("-----------------------------\n");
+    }
+
+    fclose(f);
 }
 
 int main() {
@@ -110,30 +104,27 @@ int main() {
     int opcion;
 
     do {
-        printf("\n1. Crear Vehiculo\n2. Mostrar Datos Generales\n3. Modificar Vehiculo\n4. Borrar Vehiculo\n5. Salir\n");
+        printf("\n1. Crear y Guardar Vehiculo\n2. Mostrar Vehiculos Guardados\n3. Salir\n");
         printf("Ingrese opcion: ");
         scanf("%d", &opcion);
 
         switch(opcion) {
             case 1:
                 crearVehiculo(&vehiculo);
+                guardarVehiculo(vehiculo);
                 break;
             case 2:
-                mostrarDatosGenerales(vehiculo);
+                mostrarVehiculosGuardados();
                 break;
             case 3:
-                modificarVehiculo(&vehiculo);
-                break;
-            case 4:
-                borrarVehiculo(&vehiculo);
-                break;
-            case 5:
                 printf("Saliendo...\n");
                 break;
             default:
                 printf("Opcion invalida\n");
         }
-    } while(opcion != 5);
+    } while(opcion != 3);
 
     return 0;
 }
+
+
